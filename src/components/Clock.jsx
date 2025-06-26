@@ -66,7 +66,7 @@ const Clock = (props) => {
       light: hour > 6 && hour < 18
     }
 
-    updateClock(city, newTimeDate)
+    updateClock(city, timezone, newTimeDate)
     setClockLight(city, newTimeDate.light)
   }
 

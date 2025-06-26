@@ -1,6 +1,7 @@
-import styled, {createGlobalStyle,ThemeProvider} from 'styled-components';
+import React, { useState } from 'react';
+import styled, {createGlobalStyle, ThemeProvider} from 'styled-components';
 import Clock from './components/Clock';
-
+import SearchClock from './components/SearchClock';
 
 const theme = {
   "primary": "#2270e4",
@@ -8,6 +9,10 @@ const theme = {
   "color":{
     "light": "#f0f0f0",
     "dark": "#333",
+  },
+  "colorBackground":{ // 修复属性名，匹配Clock组件中使用的名称
+    "light": "#fff",
+    "dark": "#222",
   },
   "background": {
     "light": "#fff",
@@ -55,25 +60,50 @@ const Container = styled.div`
   max-width: 1200px;
 `
 
-const App = () =>{
+const SearchWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+`
+
+const App = () => {
+  // 默认时钟列表
+  const [clocks, setClocks] = useState([
+    { city: 'Malaysia', timezone: 8 },
+    { city: 'New York', timezone: -4 },
+    { city: 'London', timezone: 1 }
+  ]);
+
+  // 添加新时钟
+  const handleAddClock = (city, timezone) => {
+    // 检查是否已存在相同城市的时钟
+    if (!clocks.some(clock => clock.city === city)) {
+      setClocks([...clocks, { city, timezone }]);
+    } else {
+      alert(` ${city}'s clock already exists.`);
+    }
+  };
+
   return (
     <>
-    <ThemeProvider theme={theme}>
-      <GlobalStyle />
-      <Container>
-        <Clock city = {'Melbourne'} timezone = {10}  />
-        <Clock city = {'Malaysia'} timezone = {8}  />
-        <Clock city = {'New York'} timezone = {-4}  />
-        <Clock city = {'London'} timezone = {1}  />
-
-      </Container>
-
-    </ThemeProvider>
-
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
+        <SearchWrapper>
+          <SearchClock onAddClock={handleAddClock} />
+        </SearchWrapper>
+        <Container>
+          {clocks.map((clock, index) => (
+            <Clock 
+              key={`${clock.city}-${index}`} 
+              city={clock.city} 
+              timezone={clock.timezone} 
+            />
+          ))}
+        </Container>
+      </ThemeProvider>
     </>
-
-
-  )
-}
+  );
+};
 
 export default App;
