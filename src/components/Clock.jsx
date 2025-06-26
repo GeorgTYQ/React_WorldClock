@@ -1,6 +1,9 @@
 import styled from "styled-components";
 import City from "./City";
 import Time from "./Time";
+import Pointer from "./Pointer";
+import Center from "./Center";
+import Core from "./Core";
 import { useState } from "react";
 import React from "react";
 
@@ -89,7 +92,18 @@ const Clock = (props) =>{
     
     <StyledClock light={light} size={size}>
       <City light={light}>{city}</City>
-      <Time light = {light}>{timeData.year} - {timeData.month} - {timeData.day} - {timeData.hour.toString().padStart(2, '0')} : {timeData.minute.toString().padStart(2, '0')} : {timeData.second.toString().padStart(2, '0')}
+      <Pointer light={light}>
+        {/* <Core></Core>
+        <Core></Core>
+        <Core></Core> */}
+        <Center light = {light}/>
+        <Core light = {light} angle = {timeData.hourDeg} block_size = {110} pointer_light ="#2a2a2a"
+        pointer_dark ="#fcfcfc" />        
+        <Core light = {light} angle = {timeData.minuteDeg} block_size = {150} pointer_light ="#a4a4a4"
+        pointer_dark ="#5a5a5a"/>
+        <Core light = {light} angle = {timeData.secondDeg} block_size = {120} pointer_width = {2}/>
+      </Pointer>
+      <Time light = {light}>{timeData.year}/{timeData.month}/{timeData.day}  {timeData.hour.toString().padStart(2, '0')} : {timeData.minute.toString().padStart(2, '0')} : {timeData.second.toString().padStart(2, '0')}
         
       </Time>
     </StyledClock>
