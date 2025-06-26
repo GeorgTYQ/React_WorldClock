@@ -61,10 +61,10 @@ const App = () =>{
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <Container>
-        <Clock city = {'Melbourne'} timezone = {10} light = {false} />
-        <Clock city = {'Malaysia'} timezone = {8} light = {false} />
-        <Clock city = {'New York'} timezone = {-4} light = {true} />
-        <Clock city = {'London'} timezone = {1} light = {true} />
+        <Clock city = {'Melbourne'} timezone = {10}  />
+        <Clock city = {'Malaysia'} timezone = {8}  />
+        <Clock city = {'New York'} timezone = {-4}  />
+        <Clock city = {'London'} timezone = {1}  />
 
       </Container>
 

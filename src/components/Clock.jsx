@@ -1,113 +1,124 @@
-import styled from "styled-components";
+import React from 'react'
+import styled from 'styled-components'
+
 import City from "./City";
 import Time from "./Time";
 import Pointer from "./Pointer";
 import Center from "./Center";
 import Core from "./Core";
-import { useState } from "react";
-import React from "react";
+import useClockStore from '../store/clockStore';
+
+
 
 const StyledClock = styled.div`
-  width: ${props => props.size };
+  width: ${props => props.size};
   aspect-ratio: 1/1;
-  background-color: ${({light, theme}) => light ? theme.background.light : theme.background.dark};
+  background-color: ${({ light, theme }) => light ? theme.colorBackground.light : theme.colorBackground.dark};
+  color: ${({ light, theme }) => light ? theme.color.light : theme.color.dark};
+
   border-radius: 2rem;
-  padding: 1rem;
-  margin: 1rem;
-  
+  padding: 2rem;
+  margin: 2rem;
+
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 
-  transition: all 0.3s ease-in-out;
-  &:hover{
+  transition: all 0.3s ease;
+  &:hover {
     transform: scale(1.05);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
   }
 `
-const Clock = (props) =>{
-  const {city, timezone} = props;
-  
-  const [light, setLight] = useState(false);
-  const [timeData, setTimeData] = useState(
-    {
-      dateTime: new Date(),
-      year: 0,
-      month: 0,
-      day: 0,
-      hour: 0,
-      minute: 0,
-      second: 0,
-      secondDeg: 0,
-      minuteDeg: 0,
-      hourDeg: 0,
-    }
-  )
-  const calculateTime = () =>{
-  const currentTime = new Date();
-  const utcOffset = timezone * 60 * 60 * 1000; // Convert timezone to milliseconds
-  const timeWithOffset = new Date(currentTime.getTime() + utcOffset);
 
-  const year = timeWithOffset.getUTCFullYear();
-  const month = timeWithOffset.getUTCMonth() + 1; // Months are zero
-  const hour = timeWithOffset.getUTCHours()
-  const date = timeWithOffset.getUTCDate();
-  const minute = timeWithOffset.getUTCMinutes();
-  const second = timeWithOffset.getUTCSeconds();
-  const secondDeg = 360 / 60;
-  const hourDeg = 360 / 12;
-  
-  setTimeData({
-    dateTime: timeWithOffset,
-    year: year,
-    month: month,
-    day: date,
+const Clock = (props) => {
+  const { city, timezone } = props;
+  const size = '40rem'
+
+  const updateClock = useClockStore(state => state.updateClock)
+  const setClockLight = useClockStore(state => state.setClockLight)
+  const clockData = useClockStore(state => state.clocks[city] || {})
+
+  const calculateTime = () => {
+    const currentTime = new Date()
+    const offset = timezone * 60 * 60 * 1000
+    const timeWithOffset = new Date(currentTime.getTime() + offset)
+
+    const unitDeg = 360 / 60
+    const bigUnitDeg = 360 / 12
+
+    const hour = timeWithOffset.getUTCHours()
+    const minute = timeWithOffset.getUTCMinutes()
+    const second = timeWithOffset.getUTCSeconds()
+
+    const newTimeDate = {
+      dateTime: timeWithOffset,
+      year: timeWithOffset.getUTCFullYear(),
+      month: timeWithOffset.getUTCMonth() + 1,
+      day: timeWithOffset.getUTCDate(),
+      hour,
+      minute,
+      second,
+      secoundDeg: second * unitDeg,
+      minuteDeg: minute * unitDeg + second * unitDeg / 60,
+      hourDeg: hour * bigUnitDeg + minute * unitDeg / 12,
+      light: hour > 6 && hour < 18
+    }
+
+    updateClock(city, newTimeDate)
+    setClockLight(city, newTimeDate.light)
+  }
+
+  React.useEffect(() => {
+    calculateTime()
+    const inerval = setInterval(calculateTime, 200)
+    return () => clearInterval(inerval)
+  }, [timezone, city])
+
+  const {
+    year,
+    month,
+    day,
     hour,
     minute,
     second,
-    secondDeg: second * secondDeg,
-    minuteDeg: minute * secondDeg + second * secondDeg / 60,
-    hourDeg: hour * hourDeg + minute * hourDeg / 12,
+    hourDeg,
+    minuteDeg,
+    secondDeg,
+    light
+  } = clockData
 
-  });
-  }
-  React.useEffect(() => {
-  calculateTime();
-  const handle = setInterval(() => {
-    calculateTime();
-  }, 200)
-  return () =>{
-    clearInterval(handle);
-  };   
-},[timezone,city])
 
-  React.useEffect(() => {
-    setLight(timeData.hour >= 6 && timeData.hour < 18);
-  }, [timeData.hour])//等小时变化的时候就会变）;
+  return <StyledClock light={light} size={size}>
+    <City light={light}>{city}</City>
+    <Pointer light={light}>
+      <Center light={light}></Center>
+      <Core
+        light={light}
+        angle={hourDeg}
+        pointer_width={7}
+        pointer_light="#848484"
+        pointer_dark="#ff6767"
+      ></Core>
+      <Core
+        light={light}
+        angle={minuteDeg}
+        block_size={120}
+        pointer_light="#848484"
+        pointer_dark="#fff"
+      ></Core>
+      <Core
+        light={light}
+        angle={secondDeg}
+        pointer_width={2}
+        block_size={150}
+        tail={25}
+      ></Core>
+    </Pointer>
+    <Time light={light}>{year}-{month}-{day} {hour}:{minute}:{second}</Time>
+  </StyledClock>
 
-  
-  const size = "40rem"
-  return(
-    
-    <StyledClock light={light} size={size}>
-      <City light={light}>{city}</City>
-      <Pointer light={light}>
-        {/* <Core></Core>
-        <Core></Core>
-        <Core></Core> */}
-        <Center light = {light}/>
-        <Core light = {light} angle = {timeData.hourDeg} block_size = {110} pointer_light ="#2a2a2a"
-        pointer_dark ="#fcfcfc" />        
-        <Core light = {light} angle = {timeData.minuteDeg} block_size = {150} pointer_light ="#a4a4a4"
-        pointer_dark ="#5a5a5a"/>
-        <Core light = {light} angle = {timeData.secondDeg} block_size = {120} pointer_width = {2}/>
-      </Pointer>
-      <Time light = {light}>{timeData.year}/{timeData.month}/{timeData.day}  {timeData.hour.toString().padStart(2, '0')} : {timeData.minute.toString().padStart(2, '0')} : {timeData.second.toString().padStart(2, '0')}
-        
-      </Time>
-    </StyledClock>
-  )
 }
 
-export default Clock;
+export default Clock
