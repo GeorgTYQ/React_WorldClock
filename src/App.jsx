@@ -15,8 +15,8 @@ const theme = {
     "dark": "#222",
   },
   "background": {
-    "light": "#fff",
-    "dark": "#222",
+    "light": "url(clockimage/sunrise.jpeg)",
+    "dark": "url(clockimage/night.jpg)",
   },
   "text": "#333",
   "border": "#ccc",
@@ -57,7 +57,8 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
   flex-wrap: wrap;
-  max-width: 1200px;
+
+
 `
 
 const SearchWrapper = styled.div`

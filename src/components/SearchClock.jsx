@@ -91,6 +91,9 @@ const SearchClock = ({ onAddClock }) => {
   const [searchResult, setSearchResult] = useState(null);
   
   const handleSearch = async (e) => {
+
+    
+    
     e.preventDefault();
     
     if (!search.trim()) {
@@ -103,7 +106,9 @@ const SearchClock = ({ onAddClock }) => {
     
     try {
       // 使用 WorldTimeAPI 获取时区信息
-      const response = await fetch(`https://worldtimeapi.org/api/timezone/${encodeURIComponent(search)}`);
+      const response = await fetch(`https://worldtimeapi.org/api/timezone/${encodeURIComponent(search.trim().replace(/\s+/g, '_'))}`);
+
+      // const resonse = await fetch
       
       if (!response.ok) {
         // 如果找不到精确匹配，尝试获取可用时区列表并进行模糊匹配
@@ -154,8 +159,9 @@ const SearchClock = ({ onAddClock }) => {
       setSearchResult(null);
     }
   };
-  
   return (
+
+    
     <SearchContainer>
       <Title>Find World Clock</Title>
       <SearchForm onSubmit={handleSearch}>
